@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopVibe - פרטי מוצר</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #06070a;
+      --card-bg: rgba(18, 20, 32, 0.85);
+      --accent-pink: #ff007f;
+      --accent-orange: #ff5500;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; }
+    body { background-color: var(--bg-dark); color: #fff; padding: 40px 6%; }
+
+    .product-view {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    @media(max-width: 768px) { .product-view { grid-template-columns: 1fr; } }
+
+    .main-img { width: 100%; border-radius: 20px; height: 350px; object-fit: cover; }
+    .live-tag { color: var(--accent-pink); font-weight: 800; font-size: 14px; margin-bottom: 10px; }
+    .price { font-size: 32px; font-weight: 900; color: var(--accent-orange); margin: 15px 0; }
+    .buy-btn {
+      width: 100%; padding: 16px; border-radius: 16px; border: none;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+      color: #fff; font-size: 18px; font-weight: 900; cursor: pointer; margin-top: 20px;
+    }
+    .back-btn { display: inline-block; color: #94a3b8; text-decoration: none; margin-bottom: 20px; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-btn">➔ חזרה לחנות</a>
+
+  <div class="product-view" id="productDetails">
+    <h2>טוען נתוני מוצר...</h2>
+  </div>
+
+  <script>
+    const products = [
+      { id: 1, name: "אוזניות Premium 3D", price: 299, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800", desc: "אוזניות סאונד מרחבי באיכות אולפן עם מנוע אינטליגנטי לביטול רעשים אקטיבי." },
+      { id: 2, name: "שעון ספורט AMOLED", price: 199, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800", desc: "שעון כושר חכם עם צג AMOLED צבעוני, מד דופק רציף ומעקב שינה מתקדם." },
+      { id: 3, name: "מצלמת אקסטרים 4K", price: 450, img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800", desc: "מצלמת אקסטרים חסינה למים ברזולוציית 4K עם מייצב תמונה אלקטרוני מובנה." },
+      { id: 4, name: "משקפי VR עתידניים", price: 890, img: "https://images.unsplash.com/photo-1622979135225-d2ba269bc1bd?w=800", desc: "ערכת מציאות מדומה אלחוטית לחלוטין ברזולוציה גבוהה וחוויית טבילה מושלמת." }
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const pId = parseInt(params.get('id'));
+    const product = products.find(p => p.id === pId) || products[0];
+
+    document.getElementById('productDetails').innerHTML = `
+      <div>
+        <img src="${product.img}" class="main-img">
+      </div>
+      <div>
+        <div class="live-tag">🔥 18 אנשים צופים במוצר זה כרגע</div>
+        <h1>${product.name}</h1>
+        <div class="price">₪${product.price}</div>
+        <p style="color: #94a3b8; line-height: 1.6;">${product.desc}</p>
+        <button class="buy-btn" onclick="addToCartAndGo()">הוסף לעגלה ועבור לקופה 🚀</button>
+      </div>
+    `;
+
+    function addToCartAndGo() {
+      let cart = JSON.parse(localStorage.getItem('shopvibe_cart')) || [];
+      cart.push(product);
+      localStorage.setItem('shopvibe_cart', JSON.stringify(cart));
+      window.location.href = 'checkout.html';
+    }
+  </script>
+</body>
+</html>

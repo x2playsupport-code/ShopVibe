@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopVibe - תשלום מאובטח</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #06070a;
+      --card-bg: rgba(18, 20, 32, 0.85);
+      --accent-pink: #ff007f;
+      --accent-orange: #ff5500;
+      --accent-green: #00e676;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; }
+    body { background-color: var(--bg-dark); color: #fff; padding: 40px 5%; }
+
+    .checkout-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    @media (max-width: 768px) { .checkout-container { grid-template-columns: 1fr; } }
+
+    .checkout-box {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(15px);
+    }
+
+    .box-title { font-size: 22px; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+    .express-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: #fff;
+      color: #000;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s;
+    }
+    .express-btn:hover { transform: scale(1.02); }
+
+    .divider { text-align: center; color: var(--text-muted); margin: 20px 0; font-size: 14px; }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    .pay-now-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 5px 25px rgba(255, 0, 127, 0.4);
+    }
+
+    .security-tag { color: var(--accent-green); font-size: 13px; font-weight: 700; text-align: center; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+  <div class="checkout-container">
+    
+    <!-- Express Pay Section -->
+    <div class="checkout-box">
+      <div class="box-title">⚡ תשלום מהיר</div>
+      <button class="express-btn"> Pay (אפל פיי)</button>
+      <button class="express-btn" style="background: #4285F4; color: #fff;">G Pay (גוגל פיי)</button>
+      
+      <div class="divider">או בצע תשלום רגיל באשראי</div>
+
+      <input type="text" class="input-field" placeholder="שם מלא">
+      <input type="email" class="input-field" placeholder="אימייל לקבלת חשבונית">
+      <input type="text" class="input-field" placeholder="כתובת למשלוח (עיר, רחוב, בית)">
+    </div>
+
+    <!-- Credit Card Section -->
+    <div class="checkout-box">
+      <div class="box-title">💳 פרטי אשראי מאובטחים</div>
+      <input type="text" class="input-field" placeholder="מספר כרטיס אשראי">
+      <div style="display: flex; gap: 10px;">
+        <input type="text" class="input-field" placeholder="תוקף (MM/YY)">
+        <input type="text" class="input-field" placeholder="CVC">
+      </div>
+      <button class="pay-now-btn">🔒 אישור ותשלום ₪249</button>
+      <div class="security-tag">🛡️ העסקה מוצפנת בטכנולוגיית SSL 256-Bit</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

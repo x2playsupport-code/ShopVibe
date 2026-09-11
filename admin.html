@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopVibe - Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { background: #06070a; color: #fff; font-family: 'Heebo', sans-serif; padding: 40px 6%; }
+    .card { background: rgba(18, 20, 32, 0.85); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 25px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    th { color: #ff007f; }
+  </style>
+</head>
+<body>
+
+  <h1>📊 פאנל ניהול הזמנות - ShopVibe</h1>
+  <p style="color: #94a3b8; margin-bottom: 20px;">מעקב בלייב אחר הזמנות שנכנסו למערכת</p>
+
+  <div class="card">
+    <h3>🛒 הזמנות אחרונות</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>מזהה הזמנה</th>
+          <th>שם לקוח</th>
+          <th>תאריך</th>
+          <th>סכום</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTable"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const orders = JSON.parse(localStorage.getItem('shopvibe_orders')) || [];
+    const table = document.getElementById('ordersTable');
+
+    if (orders.length === 0) {
+      table.innerHTML = '<tr><td colspan="4">אין הזמנות חדשות במערכת.</td></tr>';
+    } else {
+      table.innerHTML = orders.map(o => `
+        <tr>
+          <td>#${o.id}</td>
+          <td>${o.customer}</td>
+          <td>${o.date}</td>
+          <td style="color: #ff5500; font-weight: 800;">₪${o.total}</td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
