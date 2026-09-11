@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopVibe Global Choice</title>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
-  <!-- טעינת ה-SDK של PayPal -->
-  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=ILS"></script>
+  <!-- SDK של PayPal מחובר ל-Client ID של החשבון שלך -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAANRkjZFZea5kbzak7R71gxINaHHQKI22Pv3RqcCPfxe1cJONn8hQnX7JNTYOxMvF6Q7B8CZGOen8jSi8&currency=ILS"></script>
   <style>
     :root {
       --bg-surface: #0f172a;
@@ -167,7 +167,6 @@
 
       <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">2. תשלום בטוח בכרטיס אשראי / PayPal</h4>
       
-      <!-- אזור כפתורי PayPal -->
       <div id="paypal-button-container"></div>
 
       <button onclick="closeModal('checkoutModal')" style="width:100%; background:none; border:none; color:var(--text-muted); margin-top: 10px; cursor:pointer;">ביטול</button>
@@ -188,16 +187,10 @@
   </div>
 
   <script>
-    // ----------------------------------------------------
-    // כתובת האימייל של חשבון ה-PayPal העסקי/אישי שלך:
-    const PAYPAL_EMAIL = "x2playsupport@gmail.com";
-    // ----------------------------------------------------
-
     const ADMIN_EMAIL = "x2playsupport@gmail.com";
     const FALLBACK_IMG = "https://via.placeholder.com/400x300/1e293b/38bdf8?text=Image+Not+Found";
     let currentUser = localStorage.getItem('sv_user') || null;
     let selectedProduct = null;
-    let paypalRendered = false;
 
     const citiesList = ["תל אביב - יפו", "ירושלים", "חיפה", "ראשון לציון", "פתח תקווה", "אשדוד", "נתניה", "באר שבע", "חולון", "רמת גן", "אילת"];
 
@@ -379,7 +372,7 @@
 
     function renderPayPalButton() {
       const container = document.getElementById('paypal-button-container');
-      container.innerHTML = ''; // איפוס כפתורים קודמים
+      container.innerHTML = '';
 
       paypal.Buttons({
         style: {
@@ -428,7 +421,7 @@
               user: currentUser,
               product: selectedProduct,
               pickupPoint: `${pickup} (${city})`,
-              status: 'משולם (PayPal)',
+              status: 'משולם (PayPal Live)',
               paypalOrderID: details.id,
               date: now.toLocaleDateString('he-IL')
             };
