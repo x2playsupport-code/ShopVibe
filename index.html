@@ -43,7 +43,7 @@
 
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
     .product-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-    .product-img { width: 100%; height: 200px; object-fit: cover; }
+    .product-img { width: 100%; height: 200px; object-fit: cover; background: #020617; }
     .product-content { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between; }
     .product-title { font-size: 14px; font-weight: 700; }
     .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
@@ -83,12 +83,13 @@
     <!-- Admin Panel -->
     <div class="admin-card" id="adminPanel">
       <h3 style="color: var(--accent-orange);">👑 ניהול מוצרים (מנהל מערכת)</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">חובה למלא את כל השדות כולל תיאור מפורט וקישור תמונה תקין.</p>
       <div class="form-grid">
-        <input type="text" id="newTitle" placeholder="שם המוצר">
-        <input type="number" id="newPrice" placeholder="מחיר ב-₪">
-        <input type="text" id="newImg" placeholder="קישור לתמונה (URL)">
-        <input type="text" id="newCategory" placeholder="קטגוריה">
-        <textarea id="newDesc" placeholder="תיאור מפורט" style="grid-column: span 2;"></textarea>
+        <input type="text" id="newTitle" placeholder="שם המוצר (חובה)">
+        <input type="number" id="newPrice" placeholder="מחיר ב-₪ (חובה)">
+        <input type="text" id="newImg" placeholder="קישור לתמונה URL (חובה)">
+        <input type="text" id="newCategory" placeholder="קטגוריה (חובה)">
+        <textarea id="newDesc" placeholder="תיאור מפורט של המוצר (חובה)" style="grid-column: span 2; height: 80px;"></textarea>
       </div>
       <button class="btn-action" onclick="addNewProduct()">הוסף מוצר לחנות 🚀</button>
     </div>
@@ -165,6 +166,7 @@
 
   <script>
     const ADMIN_EMAIL = "x2playsupport@gmail.com";
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500";
     let currentUser = localStorage.getItem('sv_user') || null;
     let selectedProduct = null;
 
@@ -193,9 +195,10 @@
       } else {
         grid.innerHTML = products.map(p => `
           <div class="product-card">
-            <img src="${p.img}" class="product-img">
+            <img src="${p.img}" class="product-img" onerror="this.onerror=null; this.src='${FALLBACK_IMG}';">
             <div class="product-content">
               <div>
+                <div style="font-size: 11px; color: var(--accent-blue); font-weight: 700; margin-bottom: 2px;">${p.category || 'כללי'}</div>
                 <div class="product-title">${p.title}</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${p.desc}</div>
               </div>
@@ -248,20 +251,27 @@
 
     function addNewProduct() {
       if (currentUser.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return alert('אין הרשאה!');
-      const title = document.getElementById('newTitle').value;
+      
+      const title = document.getElementById('newTitle').value.trim();
       const price = parseFloat(document.getElementById('newPrice').value);
-      const img = document.getElementById('newImg').value;
-      const desc = document.getElementById('newDesc').value;
+      const img = document.getElementById('newImg').value.trim();
+      const category = document.getElementById('newCategory').value.trim();
+      const desc = document.getElementById('newDesc').value.trim();
 
-      if (!title || !price || !img) return alert('חובה למלא את כל השדות!');
+      // בדיקת חובה לכל השדות
+      if (!title || isNaN(price) || !img || !category || !desc) {
+        return alert('⚠️ חובה למלא את כל השדות כולל תיאור, קטגוריה וקישור תמונה!');
+      }
 
       let products = getProducts();
-      products.push({ id: Date.now(), title, price, img, desc });
+      products.push({ id: Date.now(), title, price, img, category, desc });
       localStorage.setItem('sv_products', JSON.stringify(products));
 
+      // ניקוי שדות
       document.getElementById('newTitle').value = '';
       document.getElementById('newPrice').value = '';
       document.getElementById('newImg').value = '';
+      document.getElementById('newCategory').value = '';
       document.getElementById('newDesc').value = '';
 
       alert('המוצר נוסף בהצלחה!');
