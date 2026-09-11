@@ -3,218 +3,245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShopVibe - AliExpress Style Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
+  <title>ShopVibe Global Choice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ali-red: #ff4747;
-      --ali-orange: #ff6e00;
-      --ali-yellow: #fff8e7;
-      --bg-gray: #f2f3f7;
-      --card-bg: #ffffff;
-      --text-dark: #222222;
-      --text-muted: #757575;
-      --border-color: #e5e5e5;
+      --bg-surface: #0f172a;
+      --card-bg: #1e293b;
+      --accent-red: #ff3b30;
+      --accent-orange: #ff9500;
+      --accent-blue: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; }
-    body { background-color: var(--bg-gray); color: var(--text-dark); padding-bottom: 80px; }
+    body { background-color: var(--bg-surface); color: var(--text-main); min-height: 100vh; padding-bottom: 80px; }
 
-    /* Header Section */
-    header { background: #ffffff; border-bottom: 2px solid var(--ali-red); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .top-bar { background: #191919; color: #fff; font-size: 12px; padding: 6px 8%; display: flex; justify-content: space-between; }
-    .nav-main { display: flex; align-items: center; justify-content: space-between; padding: 12px 8%; gap: 20px; }
+    /* Top Bar */
+    .top-bar { background: #020617; font-size: 12px; padding: 8px 8%; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); color: var(--text-muted); }
 
-    .brand-logo { font-family: 'Roboto', sans-serif; font-size: 30px; font-weight: 900; color: var(--ali-red); text-decoration: none; display: flex; align-items: center; gap: 5px; }
-    .brand-logo span { color: var(--ali-orange); font-size: 16px; background: var(--ali-yellow); padding: 2px 8px; border-radius: 4px; border: 1px solid #ffd591; }
+    /* Header */
+    header { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; }
+    .nav-main { display: flex; align-items: center; justify-content: space-between; padding: 16px 8%; gap: 20px; }
 
-    .search-bar { flex: 1; display: flex; max-width: 650px; }
-    .search-bar input { flex: 1; padding: 10px 15px; border: 2px solid var(--ali-red); border-radius: 0 20px 20px 0; outline: none; font-size: 14px; }
-    .search-bar button { background: var(--ali-red); color: #fff; border: none; padding: 0 25px; border-radius: 20px 0 0 20px; font-weight: 700; cursor: pointer; }
+    .brand-logo { font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 900; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .brand-logo span { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    .user-actions { display: flex; gap: 15px; align-items: center; }
-    .btn-action { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 12px; color: var(--text-dark); font-weight: 700; position: relative; }
+    .search-container { flex: 1; max-width: 600px; position: relative; }
+    .search-container input { width: 100%; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.05); color: #fff; font-size: 14px; outline: none; }
+    .search-container input:focus { border-color: var(--accent-orange); }
 
-    /* Layout Grid */
-    .main-container { padding: 20px 8%; display: grid; grid-template-columns: 240px 1fr; gap: 20px; }
-    @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } }
+    .user-actions { display: flex; gap: 20px; align-items: center; }
+    .btn-icon { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 13px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
-    /* Sidebar Categories */
-    .categories-card { background: #fff; border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); }
-    .categories-card h3 { font-size: 16px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-    .category-list { list-style: none; }
-    .category-list li { padding: 8px 0; font-size: 14px; color: var(--text-muted); cursor: pointer; display: flex; justify-content: space-between; }
-    .category-list li:hover { color: var(--ali-red); font-weight: 700; }
+    /* Layout */
+    .container { padding: 30px 8%; }
+
+    /* Admin Panel */
+    .admin-card { background: var(--card-bg); border: 2px dashed var(--accent-orange); border-radius: 16px; padding: 25px; margin-bottom: 30px; display: none; }
+    .admin-card.active { display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+    .form-grid input, .form-grid textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; font-size: 14px; }
 
     /* Product Grid */
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; }
-    .product-card { background: #fff; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: box-shadow 0.2s ease; position: relative; }
-    .product-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.12); border-color: var(--ali-orange); }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .product-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s; position: relative; }
+    .product-card:hover { transform: translateY(-4px); border-color: var(--accent-orange); }
 
-    .badge-deal { position: absolute; top: 10px; right: 10px; background: var(--ali-red); color: #fff; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; }
-    .product-img { width: 100%; height: 180px; object-fit: cover; }
-    .product-details { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-    .product-title { font-size: 13px; font-weight: 700; color: var(--text-dark); height: 36px; overflow: hidden; line-height: 1.4; }
-    
-    .rating-row { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #ffb400; }
-    .sold-count { color: var(--text-muted); font-size: 11px; }
+    .product-img { width: 100%; height: 200px; object-fit: cover; }
+    .product-content { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between; }
+    .product-title { font-size: 14px; font-weight: 700; line-height: 1.4; height: 40px; overflow: hidden; }
+    .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
+    .price-tag { font-size: 22px; font-weight: 900; color: var(--accent-orange); }
 
-    .price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 5px; }
-    .price-current { font-size: 20px; font-weight: 900; color: var(--ali-red); }
-    .price-original { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
+    .btn-action { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border: none; color: #fff; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
 
-    .btn-buy { background: linear-gradient(90deg, #ff6e00, #ff4747); color: #fff; border: none; padding: 8px; border-radius: 6px; font-weight: 800; cursor: pointer; margin-top: 8px; }
-
-    /* Admin Add Product Panel */
-    .admin-panel { background: #fff; border: 2px dashed var(--ali-orange); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; }
-    .admin-panel.active { display: block; }
-    .form-group { margin-bottom: 10px; }
-    .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; }
-
-    /* Modal Windows */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
+    /* Modals */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
     .modal-overlay.active { display: flex; }
-    .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-box { background: var(--card-bg); border-radius: 20px; padding: 30px; width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); }
 
-    .order-tracker { background: #f8f9fa; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
-    .timeline { border-right: 2px solid var(--ali-orange); padding-right: 15px; margin-top: 10px; }
-    .timeline-item { margin-bottom: 10px; position: relative; }
-    .timeline-item::before { content: "●"; position: absolute; right: -21px; color: var(--ali-orange); }
+    .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; margin-top: 6px; margin-bottom: 12px; outline: none; }
+    .input-field:focus { border-color: var(--accent-blue); }
+
+    .timeline { border-right: 2px solid var(--accent-orange); padding-right: 15px; margin-top: 15px; }
+    .timeline-item { margin-bottom: 12px; position: relative; font-size: 13px; }
+    .timeline-item::before { content: "●"; position: absolute; right: -21px; color: var(--accent-orange); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <span>🔥 דילים של עד 90% הנחה | משלוח מהיר לישראל</span>
-    <span id="userStatusText">אורח/ת</span>
+    <span>🚚 משלוחים מהירים בכל הארץ דרך דואר ישראל</span>
+    <span id="userStatusText">משתמש אורח</span>
   </div>
 
   <header>
     <div class="nav-main">
-      <a href="#" class="brand-logo">ShopVibe <span>CHOICE</span></a>
-      <div class="search-bar">
-        <input type="text" placeholder="חפש מוצרים, מותגים או תיאור...">
-        <button>חיפוש</button>
+      <a href="#" class="brand-logo">Shop<span>Vibe</span></a>
+      <div class="search-container">
+        <input type="text" placeholder="חפש מוצרים בחנות...">
       </div>
       <div class="user-actions">
-        <button class="btn-action" onclick="openLoginModal()"><span>👤</span><span id="loginBtnText">התחבר/הרשם</span></button>
-        <button class="btn-action" onclick="openOrdersModal()"><span>📦</span>ההזמנות שלי</button>
+        <button class="btn-icon" onclick="openModal('loginModal')"><span>👤</span><span id="loginBtnText">התחבר/הרשם</span></button>
+        <button class="btn-icon" onclick="openOrdersModal()"><span>📦</span>ההזמנות שלי</button>
       </div>
     </div>
   </header>
 
-  <div class="main-container">
-    <!-- Categories Sidebar -->
-    <aside class="categories-card">
-      <h3>קטגוריות מובילות</h3>
-      <ul class="category-list">
-        <li>גאדג'טים ואלקטרוניקה <span>›</span></li>
-        <li>אביזרי גיימינג <span>›</span></li>
-        <li>שעונים חכמים <span>›</span></li>
-        <li>ציוד היקפי למחשב <span>›</span></li>
-      </ul>
-    </aside>
-
-    <!-- Main Content -->
-    <main>
-      <!-- Admin Panel (Only for x2playsupport@gmail.com) -->
-      <div class="admin-panel" id="adminPanel">
-        <h3 style="color: var(--ali-orange); margin-bottom: 10px;">👑 פאנל מנהל מערכת (x2playsupport)</h3>
-        <div class="form-group"><input type="text" id="newTitle" placeholder="שם המוצר"></div>
-        <div class="form-group"><input type="number" id="newPrice" placeholder="מחיר (₪)"></div>
-        <div class="form-group"><input type="text" id="newImg" placeholder="קישור לתמונה (URL)"></div>
-        <div class="form-group"><textarea id="newDesc" placeholder="תיאור מפורט של המוצר"></textarea></div>
-        <button class="btn-buy" style="width: 100%;" onclick="addNewProduct()">➕ הוסף מוצר לחנות</button>
+  <div class="container">
+    <!-- Admin Panel (x2playsupport@gmail.com Only) -->
+    <div class="admin-card" id="adminPanel">
+      <h3 style="color: var(--accent-orange);">👑 ניהול מוצרים בחנות (מנהל)</h3>
+      <div class="form-grid">
+        <input type="text" id="newTitle" placeholder="שם המוצר">
+        <input type="number" id="newPrice" placeholder="מחיר ב-₪">
+        <input type="text" id="newImg" placeholder="קישור לתמונה (URL)">
+        <input type="text" id="newCategory" placeholder="קטגוריה">
+        <textarea id="newDesc" placeholder="תיאור מפורט של המוצר" style="grid-column: span 2;"></textarea>
       </div>
+      <button class="btn-action" onclick="addNewProduct()">הוסף מוצר לחנות 🚀</button>
+    </div>
 
-      <div class="product-grid" id="productGrid"></div>
-    </main>
+    <div class="product-grid" id="productGrid"></div>
   </div>
 
   <!-- Modal: Login -->
   <div class="modal-overlay" id="loginModal">
-    <div class="modal-content">
+    <div class="modal-box">
       <h2>התחברות לחשבון</h2>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">כדי לקנות מוצרים יש להתחבר עם דוא"ל</p>
-      <div class="form-group"><input type="email" id="loginEmail" placeholder="כתובת אימייל"></div>
-      <button class="btn-buy" style="width: 100%;" onclick="loginUser()">התחבר</button>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">הזן דוא"ל להתחברות קבועה</p>
+      <label>כתובת אימייל</label>
+      <input type="email" id="loginEmail" class="input-field" placeholder="your@email.com">
+      <button class="btn-action" onclick="loginUser()">התחבר</button>
     </div>
   </div>
 
   <!-- Modal: Checkout -->
   <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-content">
-      <h2>השלמת הזמנה מאובטחת</h2>
-      <div id="checkoutSummary" style="margin: 10px 0; font-weight: 700;"></div>
-      
-      <h4 style="margin-top: 15px;">פרטי אימות ומשלוח</h4>
-      <div class="form-group"><input type="text" id="custID" placeholder="תעודת זהות (9 ספרות)"></div>
-      <div class="form-group"><input type="text" id="custCity" placeholder="עיר מגורים"></div>
-      <div class="form-group"><input type="text" id="custAddress" placeholder="כתובת מלאה ורחוב"></div>
+    <div class="modal-box">
+      <h2>🔒 טופס רכישה ואימות פרטים</h2>
+      <div id="checkoutSummary" style="color: var(--accent-orange); font-weight: 800; margin: 10px 0;"></div>
 
-      <h4 style="margin-top: 15px;">פרטי אשראי</h4>
-      <div class="form-group"><input type="text" id="cardNum" maxlength="16" placeholder="מספר כרטיס אשראי (16 ספרות)"></div>
+      <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">1. אימות זהות ומשלוח</h4>
+      
+      <label>תעודת זהות (9 ספרות כולל ספרת ביקורת)</label>
+      <input type="text" id="custID" class="input-field" maxlength="9" placeholder="123456789">
+
+      <label>עיר מגורים בישראל</label>
+      <input type="text" id="custCity" class="input-field" list="israelCities" placeholder="הקלד שם עיר...">
+      <datalist id="israelCities"></datalist>
+
+      <label>רחוב ומספר בית</label>
+      <input type="text" id="custStreet" class="input-field" placeholder="לדוגמה: הרצל 15">
+
       <div style="display: flex; gap: 10px;">
-        <input type="text" id="cardExp" placeholder="MM/YY" style="width: 50%; padding: 8px;">
-        <input type="text" id="cardCvc" maxlength="3" placeholder="CVC" style="width: 50%; padding: 8px;">
+        <div style="flex:1;">
+          <label>דירה</label>
+          <input type="number" id="custApt" class="input-field" placeholder="דירה">
+        </div>
+        <div style="flex:1;">
+          <label>קומה</label>
+          <input type="number" id="custFloor" class="input-field" placeholder="קומה">
+        </div>
       </div>
 
-      <button class="btn-buy" style="width: 100%; margin-top: 15px;" onclick="confirmPurchasePrompt()">ביצוע תשלום 💳</button>
+      <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">2. אימות אשראי תקין</h4>
+      <label>מספר כרטיס אשראי (בדיקת Luhn בלייב)</label>
+      <input type="text" id="cardNum" class="input-field" maxlength="16" placeholder="16 ספרות הכרטיס">
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex:1;">
+          <label>תוקף</label>
+          <input type="text" id="cardExp" class="input-field" placeholder="MM/YY">
+        </div>
+        <div style="flex:1;">
+          <label>CVC</label>
+          <input type="text" id="cardCvc" class="input-field" maxlength="3" placeholder="3 ספרות בגב הכרטיס">
+        </div>
+      </div>
+
+      <button class="btn-action" style="margin-top: 15px;" onclick="processPayment()">אשר ותשלם 💳</button>
+      <button onclick="closeModal('checkoutModal')" style="width:100%; background:none; border:none; color:var(--text-muted); margin-top: 10px; cursor:pointer;">ביטול</button>
     </div>
   </div>
 
-  <!-- Modal: Orders & Tracking -->
+  <!-- Modal: Orders -->
   <div class="modal-overlay" id="ordersModal">
-    <div class="modal-content" style="max-width: 650px;">
-      <h2>📦 ההזמנות שלי ומעקב חבילות</h2>
+    <div class="modal-box" style="max-width: 650px;">
+      <h2>📦 מעקב הזמנות ודואר ישראל</h2>
       <div id="ordersListContainer" style="margin-top: 15px;"></div>
-      <button onclick="closeModal('ordersModal')" style="padding: 8px 15px; margin-top: 10px; border: none; background: #ddd; border-radius: 6px; cursor: pointer;">סגור</button>
+      <button class="btn-action" onclick="closeModal('ordersModal')" style="margin-top: 15px;">סגור</button>
     </div>
   </div>
 
   <script>
     const ADMIN_EMAIL = "x2playsupport@gmail.com";
     let currentUser = localStorage.getItem('sv_user') || null;
-    let selectedProductForBuy = null;
+    let selectedProduct = null;
 
-    let defaultProducts = [
-      { id: 101, title: "אוזניות גיימינג היקפיות RGB עם מיקרופון מנטרל רעשים", price: 149, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500", desc: "איכות שמע אולפנית, דרייברים 50mm, תאורת RGB דינמית.", rating: 4.9, sold: 1240 },
-      { id: 102, title: "שעון ספורט חכם כולל מד דופק ורוויית חמצן בדם", price: 189, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500", desc: "מסך AMOLED 1.4 אינץ', סוללה לחצי חודש, עמיד למים.", rating: 4.8, sold: 850 },
-      { id: 103, title: "מצלמת אקסטרים 4K 60FPS חסינה למים עד 30 מטר", price: 320, img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500", desc: "כוללת מייצב תמונה אלקטרוני, ערכת אביזרים מקיפה.", rating: 4.7, sold: 410 }
+    const citiesList = [
+      "תל אביב - יפו", "ירושלים", "חיפה", "ראשון לציון", "פתח תקווה", "אשדוד", "נתניה", "באר שבע", "חולון", "בני ברק", 
+      "רמת גן", "רחובות", "אשקלון", "בת ים", "הרצליה", "חדרה", "כפר סבא", "מודיעין-מכבים-רעות", "לוד", "רמלה", "רעננה", 
+      "בית שמש", "עכו", "נהריה", "קריית אתא", "גבעתיים", "הוד השרון", "אילת", "עפולה", "נס ציונה", "קריית גת"
     ];
 
+    function initCities() {
+      const datalist = document.getElementById('israelCities');
+      datalist.innerHTML = citiesList.map(c => `<option value="${c}">`).join('');
+    }
+
     function getProducts() {
-      return JSON.parse(localStorage.getItem('sv_products')) || defaultProducts;
+      return JSON.parse(localStorage.getItem('sv_products')) || [];
     }
 
     function renderProducts() {
       const products = getProducts();
       const grid = document.getElementById('productGrid');
-      grid.innerHTML = products.map(p => `
-        <div class="product-card">
-          <span class="badge-deal">Choice</span>
-          <img src="${p.img}" class="product-img">
-          <div class="product-details">
-            <div class="product-title">${p.title}</div>
-            <div class="rating-row">★ ${p.rating || 4.8} <span class="sold-count">(${p.sold || 99}+ נמכרו)</span></div>
-            <div class="price-row">
-              <span class="price-current">₪${p.price}</span>
-              <span class="price-original">₪${Math.round(p.price * 1.4)}</span>
-            </div>
-            <button class="btn-buy" onclick="initiateBuy(${p.id})">קנה עכשיו</button>
+
+      if (products.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <h2>🛒 החנות ריקה כרגע</h2>
+            <p>אין מוצרים זמינים. התחבר כמנהל (${ADMIN_EMAIL}) כדי להוסיף מוצרים חדשים.</p>
           </div>
-        </div>
-      `).join('');
+        `;
+      } else {
+        grid.innerHTML = products.map(p => `
+          <div class="product-card">
+            <img src="${p.img}" class="product-img">
+            <div class="product-content">
+              <div>
+                <div class="product-title">${p.title}</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${p.desc}</div>
+              </div>
+              <div>
+                <div class="price-row">
+                  <span class="price-tag">₪${p.price}</span>
+                  <span style="font-size: 11px; color: var(--accent-blue);">משלוח חינם</span>
+                </div>
+                <button class="btn-action" onclick="initiateCheckout(${p.id})">רכוש עכשיו</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
       checkAdminStatus();
     }
 
     function checkAdminStatus() {
-      const statusText = document.getElementById('userStatusText');
+      const userText = document.getElementById('userStatusText');
       const loginBtnText = document.getElementById('loginBtnText');
       const adminPanel = document.getElementById('adminPanel');
 
       if (currentUser) {
-        statusText.innerText = `מחובר: ${currentUser}`;
+        userText.innerText = `מחובר: ${currentUser}`;
         loginBtnText.innerText = 'החלף חשבון';
         if (currentUser.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
           adminPanel.classList.add('active');
@@ -222,18 +249,18 @@
           adminPanel.classList.remove('active');
         }
       } else {
-        statusText.innerText = 'אורח/ת';
+        userText.innerText = 'משתמש אורח';
         loginBtnText.innerText = 'התחבר/הרשם';
         adminPanel.classList.remove('active');
       }
     }
 
-    function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function loginUser() {
       const email = document.getElementById('loginEmail').value.trim();
-      if (!email || !email.includes('@')) return alert('נא להזין כתובת אימייל תקינה');
+      if (!email.includes('@')) return alert('הזן כתובת דוא"ל תקינה');
       currentUser = email;
       localStorage.setItem('sv_user', currentUser);
       closeModal('loginModal');
@@ -241,118 +268,154 @@
     }
 
     function addNewProduct() {
-      if (currentUser !== ADMIN_EMAIL) return alert('אין לך הרשאות מנהל!');
+      if (currentUser !== ADMIN_EMAIL) return alert('אין הרשאה!');
       const title = document.getElementById('newTitle').value;
       const price = parseFloat(document.getElementById('newPrice').value);
       const img = document.getElementById('newImg').value;
       const desc = document.getElementById('newDesc').value;
 
-      if (!title || !price || !img) return alert('חובה למלא שם, מחיר ותמונה!');
+      if (!title || !price || !img) return alert('חובה למלא את כל השדות!');
 
       let products = getProducts();
-      products.push({ id: Date.now(), title, price, img, desc, rating: 5.0, sold: 1 });
+      products.push({ id: Date.now(), title, price, img, desc });
       localStorage.setItem('sv_products', JSON.stringify(products));
-      alert('המוצר נוסף בהצלחה לחנות!');
+
+      document.getElementById('newTitle').value = '';
+      document.getElementById('newPrice').value = '';
+      document.getElementById('newImg').value = '';
+      document.getElementById('newDesc').value = '';
+
+      alert('המוצר נוסף בהצלחה!');
       renderProducts();
     }
 
-    function initiateBuy(id) {
+    function isValidIsraeliID(id) {
+      id = String(id).trim();
+      if (id.length !== 9 || isNaN(id)) return false;
+      return Array.from(id, Number).reduce((counter, digit, i) => {
+        const step = digit * ((i % 2) + 1);
+        return counter + (step > 9 ? step - 9 : step);
+      }, 0) % 10 === 0;
+    }
+
+    function isValidCreditCard(number) {
+      let regex = new RegExp("^[0-9]{16}$");
+      if (!regex.test(number)) return false;
+      let sum = 0;
+      for (let i = 0; i < number.length; i++) {
+        let intVal = parseInt(number.substr(i, 1));
+        if (i % 2 === 0) {
+          intVal *= 2;
+          if (intVal > 9) intVal -= 9;
+        }
+        sum += intVal;
+      }
+      return (sum % 10 === 0);
+    }
+
+    function initiateCheckout(id) {
       if (!currentUser) {
-        alert('חובה להתחבר לחשבון לפני ביצוע רכישה!');
-        openLoginModal();
+        alert('יש להתחבר לחשבון לפני ביצוע רכישה!');
+        openModal('loginModal');
         return;
       }
       const products = getProducts();
-      selectedProductForBuy = products.find(p => p.id === id);
-      document.getElementById('checkoutSummary').innerText = `מוצר: ${selectedProductForBuy.title} | מחיר: ₪${selectedProductForBuy.price}`;
-      document.getElementById('checkoutModal').classList.add('active');
+      selectedProduct = products.find(p => p.id === id);
+      document.getElementById('checkoutSummary').innerText = `מוצר: ${selectedProduct.title} | מחיר: ₪${selectedProduct.price}`;
+      openModal('checkoutModal');
     }
 
-    function confirmPurchasePrompt() {
-      const cardNum = document.getElementById('cardNum').value.trim();
-      const idNum = document.getElementById('custID').value.trim();
+    function processPayment() {
+      const id = document.getElementById('custID').value.trim();
+      const city = document.getElementById('custCity').value.trim();
+      const street = document.getElementById('custStreet').value.trim();
+      const apt = document.getElementById('custApt').value.trim();
+      const floor = document.getElementById('custFloor').value.trim();
+      const card = document.getElementById('cardNum').value.trim();
 
-      if (idNum.length !== 9 || isNaN(idNum)) return alert('תעודת זהות חייבת להכיל 9 ספרות בדיוק!');
-      if (cardNum.length !== 16 || isNaN(cardNum)) return alert('כרטיס אשראי לא תקין! יש להזין 16 ספרות.');
+      if (!isValidIsraeliID(id)) return alert('תעודת זהות אינה תקינה! יש להזין מספר ת.ז חוקי בן 9 ספרות.');
+      if (!citiesList.includes(city)) return alert('נא לבחור עיר תקינה מתוך רשימת הערים בישראל.');
+      if (!street || !apt || !floor) return alert('נא למלא כתובת מלאה כולל רחוב, דירה וקומה.');
+      if (!isValidCreditCard(card)) return alert('כרטיס האשראי אינו תקין! נכשל בבדיקת אמינות הכרטיס.');
 
-      const promptRes = confirm(`האם ברצונך לקנות מוצר זה בסכום של ₪${selectedProductForBuy.price}?`);
-      if (!promptRes) {
-        alert('הפעולה בוטלה על ידי המשתמש.');
+      const confirmBuy = confirm(`האם לאשר חיוב על סך ₪${selectedProduct.price}?`);
+      if (!confirmBuy) {
+        alert('הרכישה בוטלה.');
         closeModal('checkoutModal');
         return;
       }
 
-      // יצירת הזמנה חדשה עם מעקב בזמן אמת
       const now = new Date();
-      const newOrder = {
-        orderId: 'SV-' + Math.floor(100000 + Math.random() * 900000),
+      const order = {
+        orderId: 'IL-ILP-' + Math.floor(1000000 + Math.random() * 9000000),
         user: currentUser,
-        product: selectedProductForBuy,
+        product: selectedProduct,
+        address: `${street}, דירה ${apt}, קומה ${floor}, ${city}`,
         date: now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'}),
-        status: 'החבילה יצאה ממרכז החלוקה',
-        hasReviewed: false,
+        reviewed: false,
         timeline: [
-          { time: now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'}), text: 'ההזמנה נקלטה במערכת ושולמה בהצלחה' },
-          { time: 'לפני דקה', text: 'החבילה נארזה ונשלחה למרכז המיון' }
+          { time: now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'}), text: 'ההזמנה אושרה והועברה לטיפול במחסן הראשי' },
+          { time: 'היום', text: 'נאזם פריט - ממתין לאיסוף ע"י דואר ישראל' }
         ]
       };
 
       let orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
-      orders.push(newOrder);
+      orders.push(order);
       localStorage.setItem('sv_orders', JSON.stringify(orders));
 
-      alert('🎉 התשלום אושר! החבילה בדרך אליך.');
+      alert('🎉 התשלום בוצע בהצלחה! ההזמנה הועברה לטיפול דואר ישראל.');
       closeModal('checkoutModal');
     }
 
     function openOrdersModal() {
-      if (!currentUser) return alert('התחבר לחשבון כדי לצפות בהזמנות שלך');
+      if (!currentUser) return alert('התחבר לחשבון לצפייה בהזמנות');
       const orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
       const userOrders = orders.filter(o => o.user === currentUser);
       const container = document.getElementById('ordersListContainer');
 
       if (userOrders.length === 0) {
-        container.innerHTML = '<p>אין לך הזמנות פעילות כרגע.</p>';
+        container.innerHTML = '<p style="color: var(--text-muted);">אין לך הזמנות פעילות.</p>';
       } else {
-        container.innerHTML = userOrders.map((o, index) => `
-          <div class="order-tracker">
+        container.innerHTML = userOrders.map((o, idx) => `
+          <div style="background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);">
             <div style="display:flex; justify-content:space-between; font-weight:700;">
-              <span>הזמנה #${o.orderId}</span>
-              <span style="color: var(--ali-orange);">${o.status}</span>
+              <span>מספר מעקב דואר ישראל: ${o.orderId}</span>
+              <span style="color: var(--accent-orange);">בדרך ליעד</span>
             </div>
-            <div style="margin: 5px 0;">מוצר: ${o.product.title} (₪${o.product.price})</div>
+            <div style="font-size:13px; margin: 8px 0;"><strong>מוצר:</strong> ${o.product.title}</div>
+            <div style="font-size:12px; color: var(--text-muted);"><strong>כתובת למשלוח:</strong> ${o.address}</div>
             <div class="timeline">
               ${o.timeline.map(t => `<div class="timeline-item"><strong>${t.time}</strong> - ${t.text}</div>`).join('')}
             </div>
-            
-            <div style="margin-top: 10px; display: flex; gap: 10px;">
-              ${!o.hasReviewed ? `<button onclick="addReview(${index})" style="background:var(--ali-red); color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">כתיבת חוות דעת (פעם אחת)</button>` : '<span style="color:green; font-size:12px;">✓ הוגשה חוות דעת</span>'}
-              <button onclick="removeOrder('${o.orderId}')" style="background:#555; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">מחק מהרשימה</button>
+            <div style="margin-top: 12px; display: flex; gap: 10px;">
+              ${!o.reviewed ? `<button class="btn-action" style="padding:6px 12px; font-size:12px;" onclick="submitReview(${idx})">כתיבת חוות דעת (חד פעמי)</button>` : '<span style="color:#4ade80; font-size:12px;">✓ הוגשה חוות דעת</span>'}
+              <button onclick="deleteOrder('${o.orderId}')" style="background:none; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">מחק מהרשימה</button>
             </div>
           </div>
         `).join('');
       }
-      document.getElementById('ordersModal').classList.add('active');
+      openModal('ordersModal');
     }
 
-    function addReview(orderIndex) {
+    function submitReview(idx) {
       let orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
-      const reviewText = prompt('הזן את חוות הדעת שלך על המוצר:');
-      if (reviewText) {
-        orders[orderIndex].hasReviewed = true;
+      const review = prompt('הזן חוות דעת על המוצר (ניתן לכתוב פעם אחת בלבד):');
+      if (review) {
+        orders[idx].reviewed = true;
         localStorage.setItem('sv_orders', JSON.stringify(orders));
-        alert('תודה! חוות הדעת שלך נשמרה במערכת.');
+        alert('חוות הדעת נשמרה בהצלחה!');
         openOrdersModal();
       }
     }
 
-    function removeOrder(orderId) {
+    function deleteOrder(id) {
       let orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
-      orders = orders.filter(o => o.orderId !== orderId);
+      orders = orders.filter(o => o.orderId !== id);
       localStorage.setItem('sv_orders', JSON.stringify(orders));
       openOrdersModal();
     }
 
+    initCities();
     renderProducts();
   </script>
 </body>
