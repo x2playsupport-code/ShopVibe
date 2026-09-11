@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopVibe Global Choice</title>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
+  <!-- טעינת ה-SDK של Stripe -->
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     :root {
       --bg-surface: #0f172a;
@@ -61,6 +63,9 @@
 
     .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; margin-top: 6px; margin-bottom: 12px; outline: none; }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+
+    /* Stripe Card Element Styling */
+    #card-element { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 6px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -141,42 +146,33 @@
   <!-- Modal: Checkout -->
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal-box">
-      <h2>🔒 טופס רכישה ואימות פרטים</h2>
+      <h2>🔒 טופס רכישה מאובטח (Stripe)</h2>
       <div id="checkoutSummary" style="color: var(--accent-orange); font-weight: 800; margin: 10px 0;"></div>
 
-      <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">1. נקודת איסוף ואימות</h4>
+      <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">1. פרטי משלוח</h4>
       
-      <label>תעודת זהות (9 ספרות חוקיות)</label>
+      <label>תעודת זהות (9 ספרות)</label>
       <input type="text" id="custID" class="input-field" maxlength="9" placeholder="123456789">
 
       <label>עיר מגורים</label>
       <input type="text" id="custCity" class="input-field" list="israelCities" placeholder="בחר עיר...">
       <datalist id="israelCities"></datalist>
 
-      <label>נקודת איסוף מועדפת (סניף דואר / חנות קרובה)</label>
+      <label>נקודת איסוף מועדפת</label>
       <select id="pickupPoint" class="input-field">
         <option value="">-- בחר נקודת איסוף --</option>
-        <option value="סניף דואר מרכזי">סניף דואר מרכזי (עד 3 ימי עסקים)</option>
+        <option value="סניף דואר מרכזי">סניף דואר מרכזי</option>
         <option value="נקודת חלוקה מהירה (Super-Pharm)">נקודת חלוקה מהירה - סופר-פארם</option>
-        <option value="לוקר אלקטרוני 24/7">לוקר אלקטרוני 24/7 (איסוף עצמי)</option>
+        <option value="לוקר אלקטרוני 24/7">לוקר אלקטרוני 24/7</option>
       </select>
 
-      <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">2. אימות אשראי</h4>
-      <label>מספר כרטיס אשראי (16 ספרות)</label>
-      <input type="text" id="cardNum" class="input-field" maxlength="16" placeholder="16 ספרות הכרטיס">
+      <h4 style="margin-top: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">2. תשלום מאובטח בכרטיס אשראי</h4>
+      
+      <!-- אלמנט התשלום המאובטח של Stripe -->
+      <div id="card-element"></div>
+      <div id="card-errors" role="alert" style="color: var(--accent-red); font-size: 12px; margin-bottom: 10px;"></div>
 
-      <div style="display: flex; gap: 10px;">
-        <div style="flex:1;">
-          <label>תוקף</label>
-          <input type="text" id="cardExp" class="input-field" placeholder="MM/YY">
-        </div>
-        <div style="flex:1;">
-          <label>CVC</label>
-          <input type="text" id="cardCvc" class="input-field" maxlength="3" placeholder="3 ספרות">
-        </div>
-      </div>
-
-      <button class="btn-action" style="margin-top: 15px;" onclick="processPayment()">אשר ותשלם 💳</button>
+      <button class="btn-action" style="margin-top: 15px;" onclick="processPayment()">אשר ותשלם בבטחה 💳</button>
       <button onclick="closeModal('checkoutModal')" style="width:100%; background:none; border:none; color:var(--text-muted); margin-top: 10px; cursor:pointer;">ביטול</button>
     </div>
   </div>
@@ -195,10 +191,33 @@
   </div>
 
   <script>
+    // ----------------------------------------------------
+    // הדבק כאן את ה-Publishable Key שהעתקת מ-Stripe:
+    const STRIPE_PUBLISHABLE_KEY = "pk_test_51UESrmRxXB0MSq1FywEGko4wEffSn3YStpOIsMcgye5NxkeLKY9t9Jf5lFRjBclsTv198HXm4YaUgxdjONJU2ul5000hpdSeKy";
+    // ----------------------------------------------------
+
     const ADMIN_EMAIL = "x2playsupport@gmail.com";
     const FALLBACK_IMG = "https://via.placeholder.com/400x300/1e293b/38bdf8?text=Image+Not+Found";
     let currentUser = localStorage.getItem('sv_user') || null;
     let selectedProduct = null;
+    let stripe, elements, cardElement;
+
+    // אתחול Stripe
+    if (STRIPE_PUBLISHABLE_KEY && !STRIPE_PUBLISHABLE_KEY.includes("YOUR_KEY_HERE")) {
+      stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+      elements = stripe.elements();
+      cardElement = elements.create('card', {
+        style: {
+          base: {
+            color: '#ffffff',
+            fontFamily: 'Heebo, sans-serif',
+            fontSize: '16px',
+            '::placeholder': { color: '#94a3b8' }
+          },
+          invalid: { color: '#ff3b30' }
+        }
+      });
+    }
 
     const citiesList = ["תל אביב - יפו", "ירושלים", "חיפה", "ראשון לציון", "פתח תקווה", "אשדוד", "נתניה", "באר שבע", "חולון", "רמת גן", "אילת"];
 
@@ -274,8 +293,16 @@
       }
     }
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function openModal(id) { 
+      document.getElementById(id).classList.add('active'); 
+      if(id === 'checkoutModal' && cardElement) {
+        cardElement.mount('#card-element');
+      }
+    }
+
+    function closeModal(id) { 
+      document.getElementById(id).classList.remove('active'); 
+    }
 
     function loginUser() {
       const email = document.getElementById('loginEmail').value.trim();
@@ -371,34 +398,45 @@
       openModal('checkoutModal');
     }
 
-    function processPayment() {
+    async function processPayment() {
       const id = document.getElementById('custID').value.trim();
       const city = document.getElementById('custCity').value.trim();
       const pickup = document.getElementById('pickupPoint').value;
-      const card = document.getElementById('cardNum').value.trim();
 
       if (id.length !== 9 || isNaN(id)) return alert('הזן תעודת זהות תקינה (9 ספרות)');
       if (!city) return alert('נא לבחור עיר');
       if (!pickup) return alert('נא לבחור נקודת איסוף למשלוח');
-      if (card.length !== 16 || isNaN(card)) return alert('כרטיס אשראי לא תקין');
 
-      const now = new Date();
-      const order = {
-        orderId: 'SV-IL-' + Math.floor(100000 + Math.random() * 900000),
-        user: currentUser,
-        product: selectedProduct,
-        pickupPoint: `${pickup} (${city})`,
-        status: 'בטיפול המחסן',
-        refundRequested: false,
-        date: now.toLocaleDateString('he-IL')
-      };
+      if (!stripe) {
+        return alert('⚠️ יש להגדיר את מפתח ה-Stripe Publishable Key בקוד לפני ביצוע התשלום!');
+      }
 
-      let orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
-      orders.push(order);
-      localStorage.setItem('sv_orders', JSON.stringify(orders));
+      // יצירת Token מאובטח מול Stripe
+      const { token, error } = await stripe.createToken(cardElement);
 
-      alert('🎉 ההזמנה נקלטה במערכת!');
-      closeModal('checkoutModal');
+      if (error) {
+        document.getElementById('card-errors').innerText = error.message;
+      } else {
+        document.getElementById('card-errors').innerText = '';
+        
+        const now = new Date();
+        const order = {
+          orderId: 'SV-IL-' + Math.floor(100000 + Math.random() * 900000),
+          user: currentUser,
+          product: selectedProduct,
+          pickupPoint: `${pickup} (${city})`,
+          status: 'משולם (Stripe)',
+          stripeToken: token.id,
+          date: now.toLocaleDateString('he-IL')
+        };
+
+        let orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
+        orders.push(order);
+        localStorage.setItem('sv_orders', JSON.stringify(orders));
+
+        alert('🎉 התשלום עובד בהצלחה! ההזמנה נקלטה במערכת.');
+        closeModal('checkoutModal');
+      }
     }
 
     function openProfileModal() {
