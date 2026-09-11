@@ -49,6 +49,10 @@
     .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
     .price-tag { font-size: 22px; font-weight: 900; color: var(--accent-orange); }
 
+    .admin-controls { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-edit { background: var(--accent-blue); border: none; color: #000; padding: 8px; border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; font-size: 12px; }
+    .btn-delete { background: var(--accent-red); border: none; color: #fff; padding: 8px; border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; font-size: 12px; }
+
     .btn-action { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border: none; color: #fff; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
@@ -83,7 +87,7 @@
     <!-- Admin Panel -->
     <div class="admin-card" id="adminPanel">
       <h3 style="color: var(--accent-orange);">👑 ניהול מוצרים (מנהל מערכת)</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">חובה למלא את כל השדות כולל תיאור מפורט וקישור תמונה תקין.</p>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">חובה למלא את כל השדות. ניתן לערוך תמונה או למחוק מוצר ישירות מהכרטיסייה שלו.</p>
       <div class="form-grid">
         <input type="text" id="newTitle" placeholder="שם המוצר (חובה)">
         <input type="number" id="newPrice" placeholder="מחיר ב-₪ (חובה)">
@@ -105,6 +109,32 @@
       <label>כתובת אימייל</label>
       <input type="email" id="loginEmail" class="input-field" placeholder="your@email.com">
       <button class="btn-action" onclick="loginUser()">התחבר</button>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Product -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <h2>✏️ עריכת מוצר</h2>
+      <input type="hidden" id="editProductId">
+      
+      <label>שם המוצר</label>
+      <input type="text" id="editTitle" class="input-field">
+
+      <label>מחיר (₪)</label>
+      <input type="number" id="editPrice" class="input-field">
+
+      <label>קישור לתמונה (URL)</label>
+      <input type="text" id="editImg" class="input-field">
+
+      <label>קטגוריה</label>
+      <input type="text" id="editCategory" class="input-field">
+
+      <label>תיאור המוצר</label>
+      <textarea id="editDesc" class="input-field" style="height: 80px;"></textarea>
+
+      <button class="btn-action" onclick="saveProductEdit()">שמור שינויים 💾</button>
+      <button onclick="closeModal('editModal')" style="width:100%; background:none; border:none; color:var(--text-muted); margin-top: 10px; cursor:pointer;">ביטול</button>
     </div>
   </div>
 
@@ -166,7 +196,7 @@
 
   <script>
     const ADMIN_EMAIL = "x2playsupport@gmail.com";
-    const FALLBACK_IMG = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500";
+    const FALLBACK_IMG = "https://via.placeholder.com/400x300/1e293b/38bdf8?text=Image+Not+Found";
     let currentUser = localStorage.getItem('sv_user') || null;
     let selectedProduct = null;
 
@@ -184,6 +214,7 @@
     function renderProducts() {
       const products = getProducts();
       const grid = document.getElementById('productGrid');
+      const isAdmin = currentUser && currentUser.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
       if (products.length === 0) {
         grid.innerHTML = `
@@ -208,6 +239,12 @@
                   <span style="font-size: 11px; color: var(--accent-blue);">משלוח חינם</span>
                 </div>
                 <button class="btn-action" onclick="initiateCheckout(${p.id})">רכוש עכשיו</button>
+                ${isAdmin ? `
+                  <div class="admin-controls">
+                    <button class="btn-edit" onclick="openEditModal(${p.id})">✏️ ערוך תמונה/פרטים</button>
+                    <button class="btn-delete" onclick="deleteProduct(${p.id})">🗑️ מחק מוצר</button>
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -246,7 +283,7 @@
       currentUser = email;
       localStorage.setItem('sv_user', currentUser);
       closeModal('loginModal');
-      checkAdminStatus();
+      renderProducts();
     }
 
     function addNewProduct() {
@@ -258,7 +295,6 @@
       const category = document.getElementById('newCategory').value.trim();
       const desc = document.getElementById('newDesc').value.trim();
 
-      // בדיקת חובה לכל השדות
       if (!title || isNaN(price) || !img || !category || !desc) {
         return alert('⚠️ חובה למלא את כל השדות כולל תיאור, קטגוריה וקישור תמונה!');
       }
@@ -267,7 +303,6 @@
       products.push({ id: Date.now(), title, price, img, category, desc });
       localStorage.setItem('sv_products', JSON.stringify(products));
 
-      // ניקוי שדות
       document.getElementById('newTitle').value = '';
       document.getElementById('newPrice').value = '';
       document.getElementById('newImg').value = '';
@@ -275,6 +310,52 @@
       document.getElementById('newDesc').value = '';
 
       alert('המוצר נוסף בהצלחה!');
+      renderProducts();
+    }
+
+    function openEditModal(id) {
+      const products = getProducts();
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+
+      document.getElementById('editProductId').value = product.id;
+      document.getElementById('editTitle').value = product.title;
+      document.getElementById('editPrice').value = product.price;
+      document.getElementById('editImg').value = product.img;
+      document.getElementById('editCategory').value = product.category || '';
+      document.getElementById('editDesc').value = product.desc || '';
+
+      openModal('editModal');
+    }
+
+    function saveProductEdit() {
+      const id = parseInt(document.getElementById('editProductId').value);
+      let products = getProducts();
+      const index = products.findIndex(p => p.id === id);
+
+      if (index !== -1) {
+        products[index].title = document.getElementById('editTitle').value.trim();
+        products[index].price = parseFloat(document.getElementById('editPrice').value);
+        products[index].img = document.getElementById('editImg').value.trim();
+        products[index].category = document.getElementById('editCategory').value.trim();
+        products[index].desc = document.getElementById('editDesc').value.trim();
+
+        if (!products[index].title || isNaN(products[index].price) || !products[index].img || !products[index].desc) {
+          return alert('⚠️ כל השדות חייבים להיות מלאים!');
+        }
+
+        localStorage.setItem('sv_products', JSON.stringify(products));
+        alert('המוצר עודכן בהצלחה!');
+        closeModal('editModal');
+        renderProducts();
+      }
+    }
+
+    function deleteProduct(id) {
+      if (!confirm('האם אתה בטוח שברצונך למחוק מוצר זה?')) return;
+      let products = getProducts();
+      products = products.filter(p => p.id !== id);
+      localStorage.setItem('sv_products', JSON.stringify(products));
       renderProducts();
     }
 
@@ -331,7 +412,7 @@
       if (userOrders.length === 0) {
         container.innerHTML = '<p style="color: var(--text-muted);">אין לך הזמנות במערכת.</p>';
       } else {
-        container.innerHTML = userOrders.map((o, idx) => `
+        container.innerHTML = userOrders.map(o => `
           <div style="background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);">
             <div style="display:flex; justify-content:space-between; font-weight:700;">
               <span>מספר הזמנה: ${o.orderId}</span>
@@ -339,26 +420,10 @@
             </div>
             <div style="font-size:13px; margin: 8px 0;"><strong>מוצר:</strong> ${o.product.title} (₪${o.product.price})</div>
             <div style="font-size:12px; color: var(--text-muted);"><strong>נקודת איסוף:</strong> ${o.pickupPoint}</div>
-            
-            <div style="margin-top: 12px; display: flex; gap: 10px;">
-              ${!o.refundRequested ? `<button onclick="requestRefund('${o.orderId}')" style="background:none; border:1px solid var(--accent-red); color:var(--accent-red); padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">בקש החזר כספי</button>` : '<span style="color:var(--accent-red); font-size:12px;">תהליך החזר בטיפול</span>'}
-            </div>
           </div>
         `).join('');
       }
       openModal('profileModal');
-    }
-
-    function requestRefund(orderId) {
-      let orders = JSON.parse(localStorage.getItem('sv_orders')) || [];
-      const order = orders.find(o => o.orderId === orderId);
-      if (order) {
-        order.refundRequested = true;
-        order.status = 'בוקשה החזרה';
-        localStorage.setItem('sv_orders', JSON.stringify(orders));
-        alert('בקשת ההחזר נקלטה במערכת.');
-        openProfileModal();
-      }
     }
 
     initCities();
