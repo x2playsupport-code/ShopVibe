@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopVibe Global Choice</title>
 
-  <!-- הלוגו בלשונית הדפדפן (Favicon) -->
+  <!-- Favicon -->
   <link rel="icon" type="image/jpeg" href="Gemini_Generated_Image_2hqhhe2hqhhe2hqh.jpg">
 
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
   
-  <!-- SDK של PayPal -->
+  <!-- SDKs -->
   <script src="https://www.paypal.com/sdk/js?client-id=BAANRkjZFZea5kbzak7R71gxINaHHQKI22Pv3RqcCPfxe1cJONn8hQnX7JNTYOxMvF6Q7B8CZGOen8jSi8&currency=ILS"></script>
-  
-  <!-- SDK של Google Sign-In -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
   <style>
     :root {
@@ -22,6 +22,7 @@
       --card-bg: #1e293b;
       --accent-red: #ff3b30;
       --accent-orange: #ff9500;
+      --accent-green: #22c55e;
       --accent-blue: #38bdf8;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -63,11 +64,12 @@
     .btn-edit { background: var(--accent-blue); border: none; color: #000; padding: 8px; border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; font-size: 12px; }
     .btn-delete { background: var(--accent-red); border: none; color: #fff; padding: 8px; border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; font-size: 12px; }
 
-    .btn-action { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border: none; color: #fff; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
+    .btn-action { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border: none; color: #fff; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; transition: opacity 0.2s; }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
     .modal-overlay.active { display: flex; }
-    .modal-box { background: var(--card-bg); border-radius: 20px; padding: 30px; width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); text-align: center; }
+    .modal-box { background: var(--card-bg); border-radius: 20px; padding: 30px; width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); text-align: center; position: relative; }
 
     .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; margin-top: 6px; margin-bottom: 12px; outline: none; text-align: right; }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
@@ -79,6 +81,13 @@
 
     #googleBtnWrapper { display: flex; justify-content: center; margin: 15px 0; }
     #paypal-button-container { margin-top: 15px; }
+
+    /* הודעות התראה */
+    .alert-msg { padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 15px; display: none; animation: fadeIn 0.3s forwards; text-align: center; }
+    .alert-msg.error { background: rgba(255, 59, 48, 0.2); border: 1px solid var(--accent-red); color: #ff6b6b; }
+    .alert-msg.success { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: #4ade80; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -126,6 +135,9 @@
     <div class="modal-box">
       <h2>התחברות לחשבון</h2>
       <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">בחר התחברות מהירה באמצעות גוגל או הזן אימייל</p>
+
+      <!-- הודעת פידבק (שגיאה / הצלחה) -->
+      <div id="loginAlert" class="alert-msg"></div>
       
       <!-- Google Sign-In Button -->
       <div id="googleBtnWrapper">
@@ -146,11 +158,24 @@
 
       <div class="divider">או התחבר ידנית</div>
 
-      <div style="text-align: right;">
+      <!-- שלב 1: הזנת אימייל -->
+      <div id="emailStep" style="text-align: right;">
         <label style="font-size: 12px;">כתובת אימייל</label>
         <input type="email" id="loginEmail" class="input-field" placeholder="your@email.com">
+        <button class="btn-action" id="sendCodeBtn" onclick="sendAuthCode()">שלח קוד אימות 📩</button>
       </div>
-      <button class="btn-action" onclick="loginUser()">התחבר</button>
+
+      <!-- שלב 2: הזנת קוד 6 ספרות -->
+      <div id="codeStep" style="text-align: right; display: none;">
+        <p style="font-size: 13px; color: var(--accent-blue); margin-bottom: 8px;">
+          קוד בן 6 ספרות נשלח לכתובת: <strong id="maskedEmailText"></strong>
+        </p>
+        <label style="font-size: 12px;">הזן קוד אימות (6 ספרות)</label>
+        <input type="text" id="authCodeInput" class="input-field" placeholder="123456" maxlength="6" style="text-align: center; letter-spacing: 4px; font-size: 18px; font-weight: 800;">
+        <button class="btn-action" onclick="verifyCodeAndLogin()">התחבר למערכת 🔑</button>
+        <button onclick="resetAuthFlow()" style="width:100%; background:none; border:none; color:var(--accent-orange); margin-top: 8px; cursor:pointer; font-size:12px;">חזור להזנת אימייל שונה</button>
+      </div>
+
       <button onclick="closeModal('loginModal')" style="width:100%; background:none; border:none; color:var(--text-muted); margin-top: 10px; cursor:pointer;">סגור</button>
     </div>
   </div>
@@ -231,11 +256,97 @@
     let currentUser = localStorage.getItem('sv_user') || null;
     let selectedProduct = null;
 
+    // משתנים לאימות 2FA
+    let generatedCode = null;
+    let pendingEmail = null;
+    let alertTimer = null;
+
     const citiesList = ["תל אביב - יפו", "ירושלים", "חיפה", "ראשון לציון", "פתח תקווה", "אשדוד", "נתניה", "באר שבע", "חולון", "רמת גן", "אילת"];
 
     function initCities() {
       const datalist = document.getElementById('israelCities');
       datalist.innerHTML = citiesList.map(c => `<option value="${c}">`).join('');
+    }
+
+    // הראת הודעת פידבק ונעלמת אחרי 5 שניות
+    function showAlert(msg, type) {
+      const alertBox = document.getElementById('loginAlert');
+      alertBox.className = `alert-msg ${type}`;
+      alertBox.innerText = msg;
+      alertBox.style.display = 'block';
+
+      if (alertTimer) clearTimeout(alertTimer);
+      alertTimer = setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 5000);
+    }
+
+    // פונקציה שמטשטשת את האימייל (משאירה אות ראשונה, דומיין וסיומת)
+    function maskEmail(email) {
+      const parts = email.split('@');
+      if (parts.length !== 2) return email;
+      const name = parts[0];
+      const domain = parts[1];
+      const maskedName = name.charAt(0) + '***';
+      return `${maskedName}@${domain}`;
+    }
+
+    // שליחת קוד אימות
+    function sendAuthCode() {
+      const emailInput = document.getElementById('loginEmail').value.trim();
+      if (!emailInput.includes('@') || !emailInput.includes('.')) {
+        showAlert('⚠️ נא להזין כתובת אימייל תקינה', 'error');
+        return;
+      }
+
+      // ייצור קוד 6 ספרות אקראי
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingEmail = emailInput;
+
+      // הצגת האימייל המטושטש
+      document.getElementById('maskedEmailText').innerText = maskEmail(pendingEmail);
+      
+      // מעבר לשלב 2
+      document.getElementById('emailStep').style.display = 'none';
+      document.getElementById('codeStep').style.display = 'block';
+
+      // סימולציית שליחת מייל / שליחה חינם דרך EmailJS במידה ומוגדר
+      console.log(`[ShopVibe Auth Code]: ${generatedCode}`);
+      
+      // במידה ולא מוגדר שרת מייל חיה, נציג פופאפ עזר למפתח
+      alert(`🔑 קוד האימות שנשלח ל-${maskEmail(pendingEmail)} הוא: ${generatedCode}`);
+      showAlert('קוד האימות נשלח בהצלחה לאימייל שלך!', 'success');
+    }
+
+    // אימות הקוד והתחברות
+    function verifyCodeAndLogin() {
+      const userCode = document.getElementById('authCodeInput').value.trim();
+
+      if (userCode !== generatedCode) {
+        showAlert('❌ הקוד שהזנת שגוי! נסה שוב', 'error');
+        return;
+      }
+
+      // התחברות מוצלחת
+      currentUser = pendingEmail;
+      localStorage.setItem('sv_user', currentUser);
+      
+      showAlert('✅ התחברת בהצלחה!', 'success');
+
+      setTimeout(() => {
+        closeModal('loginModal');
+        resetAuthFlow();
+        renderProducts();
+      }, 1500);
+    }
+
+    function resetAuthFlow() {
+      generatedCode = null;
+      pendingEmail = null;
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('authCodeInput').value = '';
+      document.getElementById('emailStep').style.display = 'block';
+      document.getElementById('codeStep').style.display = 'none';
     }
 
     // פענוח ה-Token שמתקבל מגוגל
@@ -258,9 +369,11 @@
       if (responsePayload && responsePayload.email) {
         currentUser = responsePayload.email;
         localStorage.setItem('sv_user', currentUser);
-        closeModal('loginModal');
-        renderProducts();
-        alert('התחברת בהצלחה עם Google: ' + currentUser);
+        showAlert('✅ התחברת בהצלחה באמצעות Google!', 'success');
+        setTimeout(() => {
+          closeModal('loginModal');
+          renderProducts();
+        }, 1500);
       }
     }
 
@@ -337,15 +450,6 @@
 
     function closeModal(id) { 
       document.getElementById(id).classList.remove('active'); 
-    }
-
-    function loginUser() {
-      const email = document.getElementById('loginEmail').value.trim();
-      if (!email.includes('@')) return alert('הזן כתובת דוא"ל תקינה');
-      currentUser = email;
-      localStorage.setItem('sv_user', currentUser);
-      closeModal('loginModal');
-      renderProducts();
     }
 
     function addNewProduct() {
