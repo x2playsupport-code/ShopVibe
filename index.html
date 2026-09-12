@@ -9,8 +9,13 @@
   <link rel="icon" type="image/jpeg" href="Gemini_Generated_Image_2hqhhe2hqhhe2hqh.jpg">
 
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
-  <!-- SDK של PayPal מחובר ל-Client ID של החשבון שלך -->
+  
+  <!-- SDK של PayPal -->
   <script src="https://www.paypal.com/sdk/js?client-id=BAANRkjZFZea5kbzak7R71gxINaHHQKI22Pv3RqcCPfxe1cJONn8hQnX7JNTYOxMvF6Q7B8CZGOen8jSi8&currency=ILS"></script>
+  
+  <!-- SDK של Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <style>
     :root {
       --bg-surface: #0f172a;
@@ -62,11 +67,17 @@
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
     .modal-overlay.active { display: flex; }
-    .modal-box { background: var(--card-bg); border-radius: 20px; padding: 30px; width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); }
+    .modal-box { background: var(--card-bg); border-radius: 20px; padding: 30px; width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); text-align: center; }
 
-    .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; margin-top: 6px; margin-bottom: 12px; outline: none; }
+    .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #0f172a; color: #fff; margin-top: 6px; margin-bottom: 12px; outline: none; text-align: right; }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
 
+    .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; color: var(--text-muted); font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
+    .divider::before { margin-left: .5em; }
+    .divider::after { margin-right: .5em; }
+
+    #googleBtnWrapper { display: flex; justify-content: center; margin: 15px 0; }
     #paypal-button-container { margin-top: 15px; }
   </style>
 </head>
@@ -95,8 +106,8 @@
   <div class="container">
     <!-- Admin Panel -->
     <div class="admin-card" id="adminPanel">
-      <h3 style="color: var(--accent-orange);">👑 ניהול מוצרים (מנהל מערכת)</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">חובה למלא את כל השדות. ניתן לערוך תמונה או למחוק מוצר ישירות מהכרטיסייה שלו.</p>
+      <h3 style="color: var(--accent-orange); text-align: right;">👑 ניהול מוצרים (מנהל מערכת)</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px; text-align: right;">חובה למלא את כל השדות. ניתן לערוך תמונה או למחוק מוצר ישירות מהכרטיסייה שלו.</p>
       <div class="form-grid">
         <input type="text" id="newTitle" placeholder="שם המוצר (חובה)">
         <input type="number" id="newPrice" placeholder="מחיר ב-₪ (חובה)">
@@ -114,16 +125,39 @@
   <div class="modal-overlay" id="loginModal">
     <div class="modal-box">
       <h2>התחברות לחשבון</h2>
-      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">הזן דוא"ל להתחברות</p>
-      <label>כתובת אימייל</label>
-      <input type="email" id="loginEmail" class="input-field" placeholder="your@email.com">
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">בחר התחברות מהירה באמצעות גוגל או הזן אימייל</p>
+      
+      <!-- Google Sign-In Button -->
+      <div id="googleBtnWrapper">
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" 
+             data-type="standard" 
+             data-shape="pill" 
+             data-theme="outline" 
+             data-text="signin_with" 
+             data-size="large" 
+             data-logo_alignment="left">
+        </div>
+      </div>
+
+      <div class="divider">או התחבר ידנית</div>
+
+      <div style="text-align: right;">
+        <label style="font-size: 12px;">כתובת אימייל</label>
+        <input type="email" id="loginEmail" class="input-field" placeholder="your@email.com">
+      </div>
       <button class="btn-action" onclick="loginUser()">התחבר</button>
+      <button onclick="closeModal('loginModal')" style="width:100%; background:none; border:none; color:var(--text-muted); margin-top: 10px; cursor:pointer;">סגור</button>
     </div>
   </div>
 
   <!-- Modal: Edit Product -->
   <div class="modal-overlay" id="editModal">
-    <div class="modal-box">
+    <div class="modal-box" style="text-align: right;">
       <h2>✏️ עריכת מוצר</h2>
       <input type="hidden" id="editProductId">
       
@@ -149,7 +183,7 @@
 
   <!-- Modal: Checkout -->
   <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-box">
+    <div class="modal-box" style="text-align: right;">
       <h2>🔒 טופס רכישה מאובטח (PayPal)</h2>
       <div id="checkoutSummary" style="color: var(--accent-orange); font-weight: 800; margin: 10px 0;"></div>
 
@@ -180,7 +214,7 @@
 
   <!-- Modal: Profile & Orders -->
   <div class="modal-overlay" id="profileModal">
-    <div class="modal-box" style="max-width: 650px;">
+    <div class="modal-box" style="max-width: 650px; text-align: right;">
       <h2>👤 פרופיל משתמש והזמנות</h2>
       <p id="profileUserDisplay" style="color: var(--accent-blue); font-size: 14px; margin-bottom: 15px;"></p>
       
@@ -202,6 +236,32 @@
     function initCities() {
       const datalist = document.getElementById('israelCities');
       datalist.innerHTML = citiesList.map(c => `<option value="${c}">`).join('');
+    }
+
+    // פענוח ה-Token שמתקבל מגוגל
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // טיפול בהתחברות דרך גוגל
+    function handleCredentialResponse(response) {
+      const responsePayload = parseJwt(response.credential);
+      if (responsePayload && responsePayload.email) {
+        currentUser = responsePayload.email;
+        localStorage.setItem('sv_user', currentUser);
+        closeModal('loginModal');
+        renderProducts();
+        alert('התחברת בהצלחה עם Google: ' + currentUser);
+      }
     }
 
     function getProducts() {
